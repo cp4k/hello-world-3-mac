@@ -1,0 +1,15 @@
+[submodule "thirdparty/tcl"]
+	path = thirdparty/tcl
+	url = https://github.com/tcltk/tcl
+[submodule "thirdparty/tk"]
+	path = thirdparty/tk
+	url = https://github.com/tcltk/tk
+[submodule "thirdparty/openssl"]
+	path = thirdparty/openssl
+	url = https://github.com/openssl/openssl
+[submodule "thirdparty/sqlite"]
+	path = thirdparty/sqlite
+	url = https://github.com/sqlite/sqlite
+[submodule "thirdparty/cpython"]
+	path = thirdparty/cpython
+	url = https://github.com/python/cpython
