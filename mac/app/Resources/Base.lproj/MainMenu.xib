@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
+            <connections>
+                <outlet property="delegate" destination="Voe-Tx-rLC" id="GzC-gU-4Uq"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application"/>
+        <customObject id="Voe-Tx-rLC" customClass="AppDelegate">
+            <connections>
+                <outlet property="window" destination="QvC-M9-y7g" id="gIp-Ho-8D9"/>
+            </connections>
+        </customObject>
+        <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
+        <menu title="Main Menu" systemMenu="main" id="AYu-sK-qS6">
+            <items>
+                <menuItem title="HelloWorld3" id="1Xt-HY-uBw">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="HelloWorld3" systemMenu="apple" id="uQy-DD-JDr">
+                        <items>
+                            <menuItem title="About HelloWorld3" id="5kV-Vb-QxS">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="orderFrontStandardAboutPanel:" target="-1" id="Exp-CZ-Vem"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="VOq-y0-SEH"/>
+                            <menuItem title="Preferences…" keyEquivalent="," id="BOF-NM-1cW"/>
+                            <menuItem isSeparatorItem="YES" id="wFC-TO-SCJ"/>
+                            <menuItem title="Services" id="NMo-om-nkz">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Services" systemMenu="services" id="hz9-B4-Xy5"/>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="4je-JR-u6R"/>
+                            <menuItem title="Hide HelloWorld3" keyEquivalent="h" id="Olw-nP-bQN">
+                                <connections>
+                                    <action selector="hide:" target="-1" id="PnN-Uc-m68"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Hide Others" keyEquivalent="h" id="Vdr-fp-XzO">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="hideOtherApplications:" target="-1" id="VT4-aY-XCT"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Show All" id="Kd2-mp-pUS">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="unhideAllApplications:" target="-1" id="Dhg-Le-xox"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="kCx-OE-vgT"/>
+                            <menuItem title="Quit HelloWorld3" keyEquivalent="q" id="4sb-4s-VLi">
+                                <connections>
+                                    <action selector="terminate:" target="-1" id="Te7-pn-YzF"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="File" id="dMs-cI-mzQ">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="File" id="bib-Uj-vzu">
+                        <items>
+                            <menuItem title="IDLE (Python GUI)" image="IDLE" id="f4T-Wv-kln">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="openIdle:" target="Voe-Tx-rLC" id="tz4-bA-fvX"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Qt Designer" image="Designer" id="xla-KQ-sHo">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="openDesigner:" target="Voe-Tx-rLC" id="QTK-HW-Mb1"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Terminal" image="Terminal" id="zDz-5o-FZW">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="openTerminal:" target="Voe-Tx-rLC" id="Tpo-73-Lrt"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="m54-Is-iLE"/>
+                            <menuItem title="Close" keyEquivalent="w" id="DVo-aG-piG">
+                                <connections>
+                                    <action selector="performClose:" target="-1" id="HmO-Ls-i7Q"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="Help" id="wpr-3q-Mcd">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="Help" systemMenu="help" id="F2S-fz-NVQ">
+                        <items>
+                            <menuItem title="HelloWorld3 Help" keyEquivalent="?" id="FKE-Sm-Kum">
+                                <connections>
+                                    <action selector="showHelp:" target="-1" id="y7X-2Q-9no"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+            </items>
+        </menu>
+        <window title="Hello World! 3rd Ed" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="QvC-M9-y7g">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="335" y="390" width="213" height="119"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
+            <view key="contentView" id="EiT-Mj-1SZ">
+                <rect key="frame" x="0.0" y="0.0" width="213" height="143"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <stackView distribution="fill" orientation="vertical" alignment="centerX" spacing="20" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QY2-vQ-RIP">
+                        <rect key="frame" x="8" y="20" width="197" height="103"/>
+                        <subviews>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="h4o-x8-eLz">
+                                <rect key="frame" x="28" y="75" width="142" height="32"/>
+                                <buttonCell key="cell" type="push" title="Open IDLE" bezelStyle="rounded" image="IDLE" imagePosition="leading" alignment="center" borderStyle="border" inset="2" id="ZhH-DV-ybu">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="openIdle:" target="Voe-Tx-rLC" id="9Ec-gk-ZaT"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xNt-vs-hSk">
+                                <rect key="frame" x="5" y="34" width="187" height="32"/>
+                                <buttonCell key="cell" type="push" title="Open Qt Designer" bezelStyle="rounded" image="Designer" imagePosition="leading" alignment="center" borderStyle="border" inset="2" id="yYM-Ms-v5p">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="openDesigner:" target="Voe-Tx-rLC" id="d8m-1q-YdM"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="f6A-qg-hBZ">
+                                <rect key="frame" x="16" y="-7" width="166" height="32"/>
+                                <buttonCell key="cell" type="push" title="Open Terminal" bezelStyle="rounded" image="Terminal" imagePosition="leading" alignment="center" borderStyle="border" inset="2" id="efS-xj-0af">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="openTerminal:" target="Voe-Tx-rLC" id="XYm-XQ-dfK"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <visibilityPriorities>
+                            <integer value="1000"/>
+                            <integer value="1000"/>
+                            <integer value="1000"/>
+                        </visibilityPriorities>
+                        <customSpacing>
+                            <real value="3.4028234663852886e+38"/>
+                            <real value="3.4028234663852886e+38"/>
+                            <real value="3.4028234663852886e+38"/>
+                        </customSpacing>
+                    </stackView>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="bottom" secondItem="QY2-vQ-RIP" secondAttribute="bottom" constant="20" id="4Zs-Qx-Uu4"/>
+                    <constraint firstAttribute="trailing" secondItem="QY2-vQ-RIP" secondAttribute="trailing" constant="8" id="MLk-hC-VMl"/>
+                    <constraint firstItem="QY2-vQ-RIP" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="8" id="d20-pb-Mc8"/>
+                    <constraint firstItem="QY2-vQ-RIP" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" constant="20" id="gpw-k9-QT7"/>
+                </constraints>
+            </view>
+            <point key="canvasLocation" x="47" y="379"/>
+        </window>
+    </objects>
+    <resources>
+        <image name="Designer" width="32" height="32"/>
+        <image name="IDLE" width="32" height="32"/>
+        <image name="Terminal" width="32" height="32"/>
+    </resources>
+</document>

@@ -1,3 +1,8 @@
 mac/build
 mac/dist
 thirdparty/xz
+thirdparty/qt
+thirdparty/sip
+thirdparty/pyqt
+.DS_Store
+*.pyc

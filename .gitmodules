@@ -13,3 +13,6 @@
 [submodule "thirdparty/cpython"]
 	path = thirdparty/cpython
 	url = https://github.com/python/cpython
+[submodule "thirdparty/qt5"]
+	path = thirdparty/qt5
+	url = https://github.com/qt/qt5
