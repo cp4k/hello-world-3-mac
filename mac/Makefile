@@ -17,7 +17,7 @@ QT_SOURCE_CODE ?= $(REPO)/thirdparty/qt5
 SIP_SOURCE_CODE ?= $(REPO)/thirdparty/sip
 PYQT_SOURCE_CODE ?= $(REPO)/thirdparty/pyqt
 
-export CFLAGS = -arch x86_64 -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
+export CFLAGS = -arch x86_64 -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET) -O2
 
 default: build-app
 
@@ -52,7 +52,7 @@ $(TCL_FRAMEWORK): $(TCL_SOURCE_CODE)
 	$(MAKE) -C $(TCL_SOURCE_CODE)/unix install -j1 -W html -W html-tcl -W html-tk -W install-doc
 
 TK_FRAMEWORK = $(TEMP_INSTALL_ROOT)/Library/Frameworks/Tk.framework
-$(TK_FRAMEWORK): $(TK_SOURCE_CODE)
+$(TK_FRAMEWORK): $(TK_SOURCE_CODE) $(TCL_FRAMEWORK)
 	cd $(TK_SOURCE_CODE)/unix && ./configure --enable-framework --enable-threads --enable-aqua --prefix=$(TEMP_INSTALL_ROOT) --libdir=$(TEMP_INSTALL_ROOT)/Library/Frameworks
 	$(MAKE) -C $(TK_SOURCE_CODE)/unix
 	$(MAKE) -C $(TK_SOURCE_CODE)/unix install -j1 -W html -W html-tcl -W html-tk -W install-doc
@@ -135,15 +135,23 @@ $(APP)/Contents/MacOS/%.app: $(TEMP_INSTALL_ROOT)/bin/%.app
 $(APP)/Contents/Frameworks/%.framework: $(TEMP_INSTALL_ROOT)/lib/%.framework
 	ditto $< $@
 
+IDLE_APP=$(APP)/Contents/MacOS/IDLE.app
+$(IDLE_APP)/Contents/%: idle_app/%
+	mkdir -p $(@D) && cp $< $@
+
+$(IDLE_APP)/Contents/MacOS/%: idle_app/%.c
+	mkdir -p $(@D) && $(CC) $(CFLAGS) $< -o $@
+
+$(IDLE_APP): $(IDLE_APP)/Contents/Info.plist $(IDLE_APP)/Contents/Resources/IDLE.icns \
+	$(IDLE_APP)/Contents/Resources/PythonCompiled.icns $(IDLE_APP)/Contents/Resources/PythonSource.icns \
+	$(IDLE_APP)/Contents/MacOS/IDLE
+
 APP_IMAGES = $(addsuffix .png,$(addprefix $(APP)/Contents/Resources/,IDLE Designer Terminal IDLE@2x Designer@2x Terminal@2x))
 $(APP): $(APP)/Contents/Info.plist $(APP)/Contents/MacOS/Launcheroni $(APP)/Contents/Resources/AppIcon.icns $(APP_IMAGES) \
 	$(APP)/Contents/Resources/setup_environment.sh $(APP)/Contents/Resources/Base.lproj/MainMenu.nib \
-	$(PYQT_MODULE) $(APP)/Contents/Frameworks/Tcl.framework $(APP)/Contents/Frameworks/Tk.framework \
+	$(PYTHON_FRAMEWORK) $(APP)/Contents/Frameworks/Tcl.framework $(APP)/Contents/Frameworks/Tk.framework \
 	$(APP)/Contents/MacOS/IDLE.app
 	./copy_bundle.py $(TEMP_INSTALL_ROOT)/Library/Frameworks/Python.framework $(APP)/Contents/Frameworks/Python.framework $(TEMP_INSTALL_ROOT)/Library/Frameworks $(APP)/Contents/Frameworks
-
-wat:
-	echo $(TK_FRAMEWORK)
 
 build-tk: $(TCL_FRAMEWORK) $(TK_FRAMEWORK)
 build-xz: $(XZ_LIBRARY)
@@ -154,6 +162,7 @@ build-qt: $(QMAKE)
 build-sip: $(SIP)
 build-pyqt: $(PYQT_MODULE)
 build-app: $(APP)
+build-idle: $(IDLE_APP)
 
 clean: clean-tk clean-xz clean-sqlite clean-openssl clean-python clean-qt clean-sip clean-pyqt
 	rm -rf $(TEMP_INSTALL_ROOT)
@@ -178,6 +187,6 @@ clean-sip:
 clean-pyqt:
 	$(MAKE) -C $(PYQT_SOURCE_CODE) clean || true
 	
-.PHONY: build-tk build-xz build-sqlite build-openssl build-python build-qt build-sip build-pyqt
+.PHONY: build-tk build-xz build-sqlite build-openssl build-python build-qt build-sip build-pyqt build-idle build-app
 .PHONY: clean clean-tk clean-xz clean-sqlite clean-openssl clean-python clean-qt clean-sip clean-pyqt
 .PHONY: default

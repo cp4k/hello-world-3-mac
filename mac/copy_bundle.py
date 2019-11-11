@@ -10,6 +10,7 @@ import macholib.util
 def copy_bundle(src, dest, src_prefix, dest_prefix):
     subprocess.call(["rm", "-rf", dest])
     subprocess.call(["ditto", src, dest])
+    subprocess.call(["find", "-type", "l", "-delete", "dest"])
     src_prefix = os.path.abspath(src_prefix)
     dest_prefix = os.path.abspath(dest_prefix)
     for macho_file in macholib.util.iter_platform_files(dest):

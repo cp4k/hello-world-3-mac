@@ -11,4 +11,4 @@ echo "Hello World!"
 echo
 echo
 
-exec /usr/bin/env bash --login
+exec /usr/bin/env zsh -l
