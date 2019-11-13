@@ -38,16 +38,14 @@ int main(int argc, char * argv[]) {
     char *newArgv[104] = {0};
     int newArgc = 0;
 
-    char *pythondir = realpath(
+    char *contents = realpath(
         concat(
             dirname(argv[0]),
-            "/../../../../Frameworks/Python.framework/Versions/3.7/Resources/Python.app/Contents/MacOS/"
+            "/../../../../"
         ),
         NULL
     );
-    // Change directory into the Python framework. This is needed by Tk,
-    // otherwise it just shows a black screen. (I don't know why.)
-    chdir(pythondir);
+    char *python = concat(contents, "/Frameworks/Python.framework/Versions/3.7/Resources/Python.app/Contents/MacOS/Python");
 
     newArgv[0] = argv[0];
     newArgv[1] = "-c";
@@ -65,7 +63,10 @@ int main(int argc, char * argv[]) {
         newArgc++;
     }
 
-    setenv("PYTHONEXECUTABLE", concat(pythondir, "/Python"), 1);
+    setenv("PYTHONEXECUTABLE", python, 1);
+    setenv("TCL_LIBRARY", concat(contents, "/Frameworks/Tcl.framework/Versions/8.6/Resources/Scripts"), 1);
+    setenv("TK_LIBRARY", concat(contents, "/Frameworks/Tk.framework/Versions/8.6/Resources/Scripts"), 1);
+    setenv("QT_PLUGIN_PATH", concat(contents, "/PlugIns"), 1);
 
-    return execv(concat(pythondir, "/Python"), newArgv);
+    return execv(python, newArgv);
 }

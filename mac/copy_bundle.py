@@ -10,7 +10,7 @@ import macholib.util
 def copy_bundle(src, dest, src_prefix, dest_prefix):
     subprocess.call(["rm", "-rf", dest])
     subprocess.call(["ditto", src, dest])
-    subprocess.call(["find", "-type", "l", "-delete", "dest"])
+    subprocess.call(["find", dest, "-type", "l", "-delete"])
     src_prefix = os.path.abspath(src_prefix)
     dest_prefix = os.path.abspath(dest_prefix)
     for macho_file in macholib.util.iter_platform_files(dest):
@@ -35,7 +35,7 @@ def copy_bundle(src, dest, src_prefix, dest_prefix):
                         macho.write(f)
                     f.seek(0, 2)
                     f.flush()
-                    subprocess.call(["install_name_tool", "-add_rpath", os.path.relpath(dest_prefix, os.path.dirname(macho_file)), macho_file])
+                    subprocess.call(["install_name_tool", "-add_rpath", "@loader_path/" + os.path.relpath(dest_prefix, os.path.dirname(macho_file)), macho_file])
             finally:
                 macholib.util.flipwritable(macho_file, old_mode)
 if __name__ == "__main__":

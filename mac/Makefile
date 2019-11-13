@@ -31,18 +31,18 @@ $(REPO)/thirdparty/xz:
 
 $(REPO)/thirdparty/sip:
 	cd $(REPO)/thirdparty && \
-	curl https://www.riverbankcomputing.com/static/Downloads/sip/4.19.18/sip-4.19.18.tar.gz --output sip.tar.gz -L && \
-	echo 'c0bd863800ed9b15dcad477c4017cdb73fa805c25908b0240564add74d697e1e  sip.tar.gz' | shasum -a 256 -c && \
+	curl https://www.riverbankcomputing.com/static/Downloads/sip/4.19.19/sip-4.19.19.tar.gz --output sip.tar.gz -L && \
+	echo '5436b61a78f48c7e8078e93a6b59453ad33780f80c644e5f3af39f94be1ede44  sip.tar.gz' | shasum -a 256 -c && \
 	tar -xvf sip.tar.gz && \
-	mv sip-4.19.18 sip && \
+	mv sip-4.19.19 sip && \
 	rm sip.tar.gz
 	
 $(REPO)/thirdparty/pyqt:
 	cd $(REPO)/thirdparty && \
-	curl https://www.riverbankcomputing.com/static/Downloads/PyQt5/5.13.0/PyQt5_gpl-5.13.0.tar.gz --output pyqt.tar.gz -L && \
-	echo '0cdbffe5135926527b61cc3692dd301cd0328dd87eeaf1313e610787c46faff9  pyqt.tar.gz' | shasum -a 256 -c && \
+	curl https://www.riverbankcomputing.com/static/Downloads/PyQt5/5.13.1/PyQt5_gpl-5.13.1.tar.gz --output pyqt.tar.gz -L && \
+	echo '54b7f456341b89eeb3930e786837762ea67f235e886512496c4152ebe106d4af  pyqt.tar.gz' | shasum -a 256 -c && \
 	tar -xvf pyqt.tar.gz && \
-	mv PyQt5_gpl-5.13.0 pyqt && \
+	mv PyQt5_gpl-5.13.1 pyqt && \
 	rm pyqt.tar.gz
 
 TCL_FRAMEWORK = $(TEMP_INSTALL_ROOT)/Library/Frameworks/Tcl.framework
@@ -90,14 +90,25 @@ $(PYTHON_FRAMEWORK): $(PYTHON_SOURCE_CODE) $(TK_FRAMEWORK) $(TCL_FRAMEWORK) $(XZ
 	ditto $(TEMP_INSTALL_ROOT)/Applications/*/IDLE.app $(TEMP_INSTALL_ROOT)/Applications/IDLE.app
 
 QMAKE = $(TEMP_INSTALL_ROOT)/bin/qmake
-$(QMAKE): $(QT_SOURCE_CODE)
+QT_FRAMEWORK_NAMES = $(addsuffix .framework,QtConcurrent QtCore QtDesigner QtDesignerComponents QtGui QtHelp QtMacExtras QtNetwork QtOpenGL QtPrintSupport QtPublishSubscribe QtSql QtSvg QtTest QtTextToSpeech QtUiPlugin QtWidgets QtXml)
+QT_FRAMEWORKS_INSTALLROOT = $(addprefix $(TEMP_INSTALL_ROOT)/lib/,$(QT_FRAMEWORK_NAMES))
+QT_FRAMEWORKS_APP = $(addprefix $(APP)/Contents/Frameworks/,$(QT_FRAMEWORK_NAMES))
+QT_PLUGINS = $(TEMP_INSTALL_ROOT)/plugins
+QT_DESIGNER = $(TEMP_INSTALL_ROOT)/bin/Designer.app
+$(QMAKE) $(QT_FRAMEWORKS_INSTALLROOT) $(QT_PLUGINS) $(QT_DESIGNER): $(QT_SOURCE_CODE)
 	cd $(QT_SOURCE_CODE) && \
 		./configure -prefix $(TEMP_INSTALL_ROOT) -release -opensource -confirm-license \
 		-system-zlib -qt-libjpeg -qt-libpng -qt-freetype -qt-pcre -qt-harfbuzz \
-		-nomake examples -nomake tests -skip qt3d -skip qtdeclarative \
-		-skip qtquickcontrols -skip qtquickcontrols2 -skip qtwebengine \
+		-nomake examples -nomake tests -no-dbus -skip qt3d \
+		-skip qtdeclarative -skip qtquickcontrols -skip qtquickcontrols2 -skip qtwebengine \
 		-skip qtsensors -skip qtwebview -skip qt3d -skip qtcanvas3d -skip qtdatavis3d \
-		-skip qtscript -skip qtpurchasing -skip qtcharts -skip qtlottie -skip qtconnectivity
+		-skip qtscript -skip qtpurchasing -skip qtcharts -skip qtlottie -skip qtconnectivity \
+		-skip qtgamepad -skip qtmultimedia -skip qtnetworkauth -skip qtlocation \
+		-skip qtremoteobjects -skip qtserialbus -skip qtserialport -skip qtwebchannel \
+		-skip qtwebsockets -skip qtxmlpatterns \
+		-no-sql-db2 -no-sql-ibase -no-sql-mysql -no-sql-oci \
+		-no-sql-odbc -no-sql-psql -no-sql-sqlite -no-sql-sqlite2 \
+		-no-sql-tds
 	$(MAKE) -C $(QT_SOURCE_CODE)
 	$(MAKE) -C $(QT_SOURCE_CODE) -j1 install
 
@@ -113,7 +124,7 @@ PYQT_MODULE = $(PYTHON_FRAMEWORK)/Versions/Current/share/sip/PyQt5
 $(PYQT_MODULE): $(PYQT_SOURCE_CODE) $(SIP) $(PYTHON_FRAMEWORK) $(QMAKE)
 	cd $(PYQT_SOURCE_CODE) && \
 	    $(PYTHON_FRAMEWORK)/Versions/Current/bin/python3 configure.py --confirm-license \
-		 --no-qml-plugin --sip $(SIP) --qmake $(QMAKE) # TODO --qtconf-prefix
+		 --no-qml-plugin --sip $(SIP) --qmake $(QMAKE)
 	$(MAKE) -C $(PYQT_SOURCE_CODE)
 	$(MAKE) -C $(PYQT_SOURCE_CODE) -j1 install
 
@@ -126,14 +137,14 @@ $(APP)/Contents/%.nib: app/%.xib
 $(APP)/Contents/MacOS/Launcheroni: app/main.m
 	mkdir -p $(@D) && $(CC) $(CFLAGS) -fobjc-arc -framework Cocoa $< -o $@
 
-$(APP)/Contents/MacOS/%.app: $(TEMP_INSTALL_ROOT)/Applications/%.app
-	./copy_bundle.py $< $@ $(TEMP_INSTALL_ROOT)/Library/Frameworks $(APP)/Contents/Frameworks
 $(APP)/Contents/Frameworks/%.framework: $(TEMP_INSTALL_ROOT)/Library/Frameworks/%.framework
 	./copy_bundle.py $< $@ $(TEMP_INSTALL_ROOT)/Library/Frameworks $(APP)/Contents/Frameworks
-$(APP)/Contents/MacOS/%.app: $(TEMP_INSTALL_ROOT)/bin/%.app
-	ditto $< $@
 $(APP)/Contents/Frameworks/%.framework: $(TEMP_INSTALL_ROOT)/lib/%.framework
-	ditto $< $@
+	./copy_bundle.py $< $@ $(TEMP_INSTALL_ROOT)/Library/Frameworks $(APP)/Contents/Frameworks
+$(APP)/Contents/MacOS/%.app: $(TEMP_INSTALL_ROOT)/bin/%.app qt.conf
+	./copy_bundle.py $< $@ $(TEMP_INSTALL_ROOT)/Library/Frameworks $(APP)/Contents/Frameworks
+	mkdir -p $@/Contents/Resources
+	cp qt.conf $@/Contents/Resources/
 
 IDLE_APP=$(APP)/Contents/MacOS/IDLE.app
 $(IDLE_APP)/Contents/%: idle_app/%
@@ -149,9 +160,13 @@ $(IDLE_APP): $(IDLE_APP)/Contents/Info.plist $(IDLE_APP)/Contents/Resources/IDLE
 APP_IMAGES = $(addsuffix .png,$(addprefix $(APP)/Contents/Resources/,IDLE Designer Terminal IDLE@2x Designer@2x Terminal@2x))
 $(APP): $(APP)/Contents/Info.plist $(APP)/Contents/MacOS/Launcheroni $(APP)/Contents/Resources/AppIcon.icns $(APP_IMAGES) \
 	$(APP)/Contents/Resources/setup_environment.sh $(APP)/Contents/Resources/Base.lproj/MainMenu.nib \
-	$(PYTHON_FRAMEWORK) $(APP)/Contents/Frameworks/Tcl.framework $(APP)/Contents/Frameworks/Tk.framework \
-	$(APP)/Contents/MacOS/IDLE.app
+	$(PYQT_MODULE) $(TCL_FRAMEWORK) $(APP)/Contents/Frameworks/Tk.framework \
+	$(APP)/Contents/MacOS/IDLE.app $(APP)/Contents/MacOS/Designer.app $(QT_FRAMEWORKS_APP) $(QT_PLUGINS)
+	# Need to copy Tcl.framework and Python.framework in this step, not using the
+	# rules above, so we know Tk/Qt/etc have been properly installed into them.
+	./copy_bundle.py $(TEMP_INSTALL_ROOT)/Library/Frameworks/Tcl.framework $(APP)/Contents/Frameworks/Tcl.framework $(TEMP_INSTALL_ROOT)/Library/Frameworks $(APP)/Contents/Frameworks
 	./copy_bundle.py $(TEMP_INSTALL_ROOT)/Library/Frameworks/Python.framework $(APP)/Contents/Frameworks/Python.framework $(TEMP_INSTALL_ROOT)/Library/Frameworks $(APP)/Contents/Frameworks
+	./copy_bundle.py $(QT_PLUGINS) $(APP)/Contents/PlugIns $(TEMP_INSTALL_ROOT)/Library/Frameworks $(APP)/Contents/Frameworks
 
 build-tk: $(TCL_FRAMEWORK) $(TK_FRAMEWORK)
 build-xz: $(XZ_LIBRARY)
