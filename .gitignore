@@ -4,5 +4,9 @@ thirdparty/xz
 thirdparty/qt
 thirdparty/sip
 thirdparty/pyqt
+thirdparty/sdl
+thirdparty/sdl_image
+thirdparty/sdl_mixer
+thirdparty/sdl_ttf
 .DS_Store
 *.pyc

@@ -16,3 +16,10 @@
 [submodule "thirdparty/qt5"]
 	path = thirdparty/qt5
 	url = https://github.com/qt/qt5
+[submodule "thirdparty/pygame"]
+	path = thirdparty/pygame
+	url = https://github.com/cartr/pygame-polite.git
+	branch = tag/1.9.6.1
+[submodule "thirdparty/setuptools"]
+	path = thirdparty/setuptools
+	url = https://github.com/pypa/setuptools
