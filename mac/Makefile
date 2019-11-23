@@ -244,8 +244,11 @@ $(APP)/Contents/%: app/%
 $(APP)/Contents/%.nib: app/%.xib
 	mkdir -p $(@D) && ibtool --compile $@ $<
 
-$(APP)/Contents/MacOS/Launcheroni: app/main.m
+$(APP)/Contents/MacOS/%: app/%.m
 	mkdir -p $(@D) && $(CC) $(CFLAGS) -fobjc-arc -framework Cocoa $< -o $@
+$(APP)/Contents/MacOS/%: app/%.c
+	mkdir -p $(@D) && $(CC) $(CFLAGS) $< -o $@
+
 
 $(APP)/Contents/Frameworks/%.framework: $(TEMP_INSTALL_ROOT)/Library/Frameworks/%.framework
 	./copy_bundle.py $< $@ $(APP)/Contents/Frameworks $(TEMP_INSTALL_ROOT)/Library/Frameworks $(TEMP_INSTALL_ROOT)/lib
@@ -278,7 +281,7 @@ $(APP): $(APP)/Contents/Info.plist $(APP)/Contents/MacOS/Launcheroni $(APP)/Cont
 	$(APP)/Contents/MacOS/IDLE.app $(APP)/Contents/MacOS/Designer.app $(QT_FRAMEWORKS_APP) $(QT_PLUGINS) \
 	$(APP)/Contents/Frameworks/libSDL2-2.0.0.dylib $(APP)/Contents/Frameworks/libSDL2_image-2.0.0.dylib \
 	$(APP)/Contents/Frameworks/libSDL2_mixer-2.0.0.dylib $(APP)/Contents/Frameworks/libSDL2_ttf-2.0.0.dylib \
-	$(PYGAME_MODULE) $(EASYGUI_MODULE)
+	$(PYGAME_MODULE) $(EASYGUI_MODULE) $(APP)/Contents/MacOS/python $(APP)/Contents/MacOS/python3
 	# Need to copy Python.framework in this step, not using the rules above, so we
 	# know Tk/Qt/etc have been properly installed into them.
 	./copy_bundle.py $(TEMP_INSTALL_ROOT)/Library/Frameworks/Python.framework $(APP)/Contents/Frameworks/Python.framework $(APP)/Contents/Frameworks $(TEMP_INSTALL_ROOT)/Library/Frameworks $(TEMP_INSTALL_ROOT)/lib
