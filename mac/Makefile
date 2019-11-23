@@ -22,6 +22,7 @@ SDL_MIXER_SOURCE_CODE ?= $(REPO)/thirdparty/sdl_mixer
 SDL_TTF_SOURCE_CODE ?= $(REPO)/thirdparty/sdl_ttf
 SETUPTOOLS_SOURCE_CODE ?= $(REPO)/thirdparty/setuptools
 PYGAME_SOURCE_CODE ?= $(REPO)/thirdparty/pygame
+EASYGUI_SOURCE_CODE ?= $(REPO)/thirdparty/easygui
 
 export CFLAGS = -arch x86_64 -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET) -O2
 
@@ -232,6 +233,11 @@ $(PYGAME_MODULE): $(PYGAME_SOURCE_CODE) Pygame-Setup $(SDL_LIBRARY) $(SDL_IMAGE_
 	cd $(PYGAME_SOURCE_CODE) && $(PYTHON_FRAMEWORK)/Versions/Current/bin/python3 setup.py install
 	touch $(PYGAME_MODULE)
 
+EASYGUI_MODULE = $(TEMP_INSTALL_ROOT)/easygui-built
+$(EASYGUI_MODULE): $(EASYGUI_SOURCE_CODE) $(SETUPTOOLS_MODULE)
+	cd $(EASYGUI_SOURCE_CODE) && $(PYTHON_FRAMEWORK)/Versions/Current/bin/python3 setup.py install
+	touch $(EASYGUI_MODULE)
+
 $(APP)/Contents/%: app/%
 	mkdir -p $(@D) && cp $< $@
 
@@ -272,7 +278,7 @@ $(APP): $(APP)/Contents/Info.plist $(APP)/Contents/MacOS/Launcheroni $(APP)/Cont
 	$(APP)/Contents/MacOS/IDLE.app $(APP)/Contents/MacOS/Designer.app $(QT_FRAMEWORKS_APP) $(QT_PLUGINS) \
 	$(APP)/Contents/Frameworks/libSDL2-2.0.0.dylib $(APP)/Contents/Frameworks/libSDL2_image-2.0.0.dylib \
 	$(APP)/Contents/Frameworks/libSDL2_mixer-2.0.0.dylib $(APP)/Contents/Frameworks/libSDL2_ttf-2.0.0.dylib \
-	$(PYGAME_MODULE)
+	$(PYGAME_MODULE) $(EASYGUI_MODULE)
 	# Need to copy Python.framework in this step, not using the rules above, so we
 	# know Tk/Qt/etc have been properly installed into them.
 	./copy_bundle.py $(TEMP_INSTALL_ROOT)/Library/Frameworks/Python.framework $(APP)/Contents/Frameworks/Python.framework $(APP)/Contents/Frameworks $(TEMP_INSTALL_ROOT)/Library/Frameworks $(TEMP_INSTALL_ROOT)/lib

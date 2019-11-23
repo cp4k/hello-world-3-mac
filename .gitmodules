@@ -23,3 +23,6 @@
 [submodule "thirdparty/setuptools"]
 	path = thirdparty/setuptools
 	url = https://github.com/pypa/setuptools
+[submodule "thirdparty/easygui"]
+	path = thirdparty/easygui
+	url = https://github.com/robertlugg/easygui.git
