@@ -38,8 +38,18 @@ default: $(APP)
 
 # Compile each of the libraries and install them into TEMP_INSTALL_ROOT:
 
+$(TEMP_INSTALL_ROOT):
+	mkdir -p $(TEMP_INSTALL_ROOT)/bin
+	mkdir -p $(TEMP_INSTALL_ROOT)/lib
+	mkdir -p $(TEMP_INSTALL_ROOT)/usr/local/bin
+	mkdir -p $(TEMP_INSTALL_ROOT)/usr/local/include
+	mkdir -p $(TEMP_INSTALL_ROOT)/usr/local/lib
+	mkdir -p $(TEMP_INSTALL_ROOT)/usr/local/share
+	mkdir -p $(TEMP_INSTALL_ROOT)/Library/Frameworks
+	mkdir -p $(TEMP_INSTALL_ROOT)/Applications
+
 TCL_FRAMEWORK = $(TEMP_INSTALL_ROOT)/Library/Frameworks/Tcl.framework
-$(TCL_FRAMEWORK): $(TCL_SOURCE_CODE)
+$(TCL_FRAMEWORK): $(TCL_SOURCE_CODE) $(TEMP_INSTALL_ROOT)
 	mkdir -p $(TEMP_INSTALL_ROOT)
 	cd $(TCL_SOURCE_CODE)/unix && ./configure --enable-framework --enable-threads --prefix=$(TEMP_INSTALL_ROOT) --libdir=$(TEMP_INSTALL_ROOT)/Library/Frameworks
 	$(MAKE) -C $(TCL_SOURCE_CODE)/unix
@@ -52,20 +62,19 @@ $(TK_FRAMEWORK): $(TK_SOURCE_CODE) $(TCL_FRAMEWORK)
 	$(MAKE) -C $(TK_SOURCE_CODE)/unix install -j1 -W html -W html-tcl -W html-tk -W install-doc
 
 XZ_LIBRARY = $(TEMP_INSTALL_ROOT)/usr/local/lib/liblzma.la
-$(XZ_LIBRARY): $(XZ_SOURCE_CODE)
+$(XZ_LIBRARY): $(XZ_SOURCE_CODE) $(TEMP_INSTALL_ROOT)
 	cd $(XZ_SOURCE_CODE) && ./configure --disable-shared --enable-static --disable-dependency-tracking
 	$(MAKE) -C $(XZ_SOURCE_CODE) install DESTDIR="$(TEMP_INSTALL_ROOT)"
 	
 SQLITE_LIBRARY = $(TEMP_INSTALL_ROOT)/usr/local/lib/libsqlite3.a
-$(SQLITE_LIBRARY): $(SQLITE_SOURCE_CODE)
-	mkdir -p $(TEMP_INSTALL_ROOT)
+$(SQLITE_LIBRARY): $(SQLITE_SOURCE_CODE) $(TEMP_INSTALL_ROOT)
 	cd $(SQLITE_SOURCE_CODE) && \
 	  export CFLAGS="$(CFLAGS) -Os -DSQLITE_ENABLE_FTS5 -DSQLITE_ENABLE_FTS4 -DSQLITE_ENABLE_FTS3_PARENTHESIS -DSQLITE_ENABLE_JSON1 -DSQLITE_ENABLE_RTREE -DSQLITE_TCL=0" && \
 	  ./configure --enable-threadsafe --enable-shared=no --enable-static=yes --disable-readline --disable-dependency-tracking
 	$(MAKE) -C $(SQLITE_SOURCE_CODE) install DESTDIR="$(TEMP_INSTALL_ROOT)"
 
 OPENSSL_LIBRARY = $(TEMP_INSTALL_ROOT)/usr/local/lib/pkgconfig/openssl.pc
-$(OPENSSL_LIBRARY): $(OPENSSL_SOURCE_CODE)
+$(OPENSSL_LIBRARY): $(OPENSSL_SOURCE_CODE) $(TEMP_INSTALL_ROOT)
 	cd $(OPENSSL_SOURCE_CODE) && perl Configure darwin64-x86_64-cc enable-ec_nistp_64_gcc_128 no-shared
 	$(MAKE) -C $(OPENSSL_SOURCE_CODE) install_sw DESTDIR="$(TEMP_INSTALL_ROOT)" -j1
 
@@ -89,7 +98,7 @@ QT_FRAMEWORKS_INSTALLROOT = $(addprefix $(TEMP_INSTALL_ROOT)/lib/,$(QT_FRAMEWORK
 QT_FRAMEWORKS_APP = $(addprefix $(APP)/Contents/Frameworks/,$(QT_FRAMEWORK_NAMES))
 QT_PLUGINS = $(TEMP_INSTALL_ROOT)/plugins
 QT_DESIGNER = $(TEMP_INSTALL_ROOT)/bin/Designer.app
-$(QMAKE) $(QT_FRAMEWORKS_INSTALLROOT) $(QT_PLUGINS) $(QT_DESIGNER): $(QT_SOURCE_CODE)
+$(QMAKE) $(QT_FRAMEWORKS_INSTALLROOT) $(QT_PLUGINS) $(QT_DESIGNER): $(QT_SOURCE_CODE) $(TEMP_INSTALL_ROOT)
 	cd $(QT_SOURCE_CODE) && \
 		./configure -prefix $(TEMP_INSTALL_ROOT) -release -opensource -confirm-license \
 		-system-zlib -qt-libjpeg -qt-libpng -qt-freetype -qt-pcre -qt-harfbuzz \
@@ -124,7 +133,7 @@ $(PYQT_MODULE): $(PYQT_SOURCE_CODE) $(SIP) $(PYTHON_FRAMEWORK) $(QMAKE)
 
 SDL_LIBRARY = $(TEMP_INSTALL_ROOT)/lib/libSDL2-2.0.0.dylib
 SDL_CONFIG = $(TEMP_INSTALL_ROOT)/bin/sdl2-config
-$(SDL_LIBRARY) $(SDL_CONFIG): $(SDL_SOURCE_CODE)
+$(SDL_LIBRARY) $(SDL_CONFIG): $(SDL_SOURCE_CODE) $(TEMP_INSTALL_ROOT)
 	cd $(SDL_SOURCE_CODE) && \
 		./configure --disable-static --enable-shared --enable-rpath --disable-video-x11 --prefix=$(TEMP_INSTALL_ROOT)
 	$(MAKE) -C $(SDL_SOURCE_CODE)
@@ -196,10 +205,8 @@ $(EASYGUI_MODULE): $(EASYGUI_SOURCE_CODE) $(SETUPTOOLS_MODULE)
 	touch $(EASYGUI_MODULE)
 
 LIBTELNET_LIBRARY = $(TEMP_INSTALL_ROOT)/lib/libtelnet.a
-$(LIBTELNET_LIBRARY): $(LIBTELNET_SOURCE_CODE)
+$(LIBTELNET_LIBRARY): $(LIBTELNET_SOURCE_CODE) $(TEMP_INSTALL_ROOT)
 	cd $(LIBTELNET_SOURCE_CODE) && xcodebuild SYMROOT=build -arch x86_64
-	mkdir -p $(TEMP_INSTALL_ROOT)/lib
-	mkdir -p $(TEMP_INSTALL_ROOT)/include
 	cp $(LIBTELNET_SOURCE_CODE)/build/Release/libtelnet.a $(TEMP_INSTALL_ROOT)/lib/libtelnet.a
 	cp -r $(LIBTELNET_SOURCE_CODE)/build/Release/usr/local/include/libtelnet $(TEMP_INSTALL_ROOT)/include/libtelnet
 
@@ -212,7 +219,6 @@ $(TELNET_BINARY): $(REMOTE_CMDS_SOURCE_CODE) $(LIBTELNET_LIBRARY)
 		SDKROOT=`xcrun --sdk macosx --show-sdk-path` \
 		CFLAGS="$(CFLAGS) -isystem$(TEMP_INSTALL_ROOT)/include -fPIE -D__FBSDID=__RCSID -DTERMCAP -DKLUDGELINEMODE -DUSE_TERMIO -DENV_HACK -DAUTHENTICATION -DKRB5 -DSKEY -DIPSEC -DINET6 -DFORWARD" \
 		LDFLAGS="$(LDFLAGS) -arch x86_64 -L$(TEMP_INSTALL_ROOT)/lib -lcurses -lkrb4 -lkrb5 -lipsec -ltelnet"
-	mkdir -p $(TEMP_INSTALL_ROOT)/bin
 	cp $(REMOTE_CMDS_SOURCE_CODE)/build/Products/telnet $(TEMP_INSTALL_ROOT)/bin/telnet
 
 # Create the app bundle by copying stuff in from the app/ folder, compiling

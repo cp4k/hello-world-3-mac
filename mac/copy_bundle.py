@@ -28,8 +28,10 @@ def copy_bundle(src, dest, src_prefixes, dest_prefix):
     dest_prefix = os.path.abspath(dest_prefix)
     if os.path.isfile(src):
         files = [dest]
+        subprocess.call(["mkdir", "-p", os.path.dirname(dest)])
         subprocess.call(["cp", src, dest])
     else:
+        subprocess.call(["mkdir", "-p", os.path.dirname(dest.rstrip('/'))])
         subprocess.call(["rm", "-rf", dest])
         subprocess.call(["ditto", src, dest])
         subprocess.call(["find", dest, "-type", "l", "-delete"])
