@@ -10,7 +10,10 @@ jobs:
       with:
         submodules: true
     - name: Build the software package
-      run: make -C mac -j2
+      run: |
+        sudo mkdir -p /Library/HelloWorld3/TempBuild
+        sudo chown $(whoami) /Library/HelloWorld3/TempBuild
+        make -C mac TEMP_INSTALL_ROOT=/Library/HelloWorld3/TempBuild
     - uses: actions/upload-artifact@v1
       with:
         name: HelloWorld3.app
