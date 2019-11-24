@@ -13,3 +13,6 @@ thirdparty/libtelnet
 .DS_Store
 *.pyc
 *.bak*
+
+mac/codesigning/app_store_credentials
+mac/codesigning/HelloWorld3*
