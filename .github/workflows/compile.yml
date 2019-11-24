@@ -17,4 +17,4 @@ jobs:
     - uses: actions/upload-artifact@v1
       with:
         name: HelloWorld3.app
-        path: mac/dist/HelloWorld.app
+        path: mac/dist/HelloWorld3.app
