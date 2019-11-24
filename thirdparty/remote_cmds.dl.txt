@@ -1,0 +1,3 @@
+https://opensource.apple.com/tarballs/remote_cmds/remote_cmds-60.tar.gz
+9d27417d5032113e93edebc37f82a060536bc557b119544e59c46aeb1be92820
+remote_cmds-60

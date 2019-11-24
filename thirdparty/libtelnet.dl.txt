@@ -1,0 +1,3 @@
+https://opensource.apple.com/tarballs/libtelnet/libtelnet-13.tar.gz
+e7d203083c2d9fa363da4cc4b7377d4a18f8a6f569b9bcf58f97255941a2ebd1
+libtelnet-13

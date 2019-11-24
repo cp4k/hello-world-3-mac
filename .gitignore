@@ -8,6 +8,8 @@ thirdparty/sdl
 thirdparty/sdl_image
 thirdparty/sdl_mixer
 thirdparty/sdl_ttf
+thirdparty/remote_cmds
+thirdparty/libtelnet
 .DS_Store
 *.pyc
 *.bak*

@@ -23,6 +23,8 @@ SDL_TTF_SOURCE_CODE ?= $(REPO)/thirdparty/sdl_ttf
 SETUPTOOLS_SOURCE_CODE ?= $(REPO)/thirdparty/setuptools
 PYGAME_SOURCE_CODE ?= $(REPO)/thirdparty/pygame
 EASYGUI_SOURCE_CODE ?= $(REPO)/thirdparty/easygui
+LIBTELNET_SOURCE_CODE ?= $(REPO)/thirdparty/libtelnet
+REMOTE_CMDS_SOURCE_CODE ?= $(REPO)/thirdparty/remote_cmds
 
 export CFLAGS = -arch x86_64 -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET) -O2
 
@@ -185,6 +187,26 @@ $(EASYGUI_MODULE): $(EASYGUI_SOURCE_CODE) $(SETUPTOOLS_MODULE)
 	cd $(EASYGUI_SOURCE_CODE) && $(PYTHON_FRAMEWORK)/Versions/Current/bin/python3 setup.py install
 	touch $(EASYGUI_MODULE)
 
+LIBTELNET_LIBRARY = $(TEMP_INSTALL_ROOT)/lib/libtelnet.a
+$(LIBTELNET_LIBRARY): $(LIBTELNET_SOURCE_CODE)
+	cd $(LIBTELNET_SOURCE_CODE) && xcodebuild SYMROOT=build -arch x86_64
+	mkdir -p $(TEMP_INSTALL_ROOT)/lib
+	mkdir -p $(TEMP_INSTALL_ROOT)/include
+	cp $(LIBTELNET_SOURCE_CODE)/build/Release/libtelnet.a $(TEMP_INSTALL_ROOT)/lib/libtelnet.a
+	cp -r $(LIBTELNET_SOURCE_CODE)/build/Release/usr/local/include/libtelnet $(TEMP_INSTALL_ROOT)/include/libtelnet
+
+TELNET_BINARY = $(TEMP_INSTALL_ROOT)/bin/telnet
+$(TELNET_BINARY): $(REMOTE_CMDS_SOURCE_CODE) $(LIBTELNET_LIBRARY)
+	mkdir -p $(REMOTE_CMDS_SOURCE_CODE)/build/Intermediates/telnet
+	mkdir -p $(REMOTE_CMDS_SOURCE_CODE)/build/Products
+	$(MAKE) -C $(REMOTE_CMDS_SOURCE_CODE)/telnet.tproj OBJROOT=../build/Intermediates \
+		SYMROOT=../build/Products DSTROOT=../build/Archive \
+		SDKROOT=`xcrun --sdk macosx --show-sdk-path` \
+		CFLAGS="$(CFLAGS) -isystem$(TEMP_INSTALL_ROOT)/include -fPIE -D__FBSDID=__RCSID -DTERMCAP -DKLUDGELINEMODE -DUSE_TERMIO -DENV_HACK -DAUTHENTICATION -DKRB5 -DSKEY -DIPSEC -DINET6 -DFORWARD" \
+		LDFLAGS="$(LDFLAGS) -arch x86_64 -L$(TEMP_INSTALL_ROOT)/lib -lcurses -lkrb4 -lkrb5 -lipsec -ltelnet"
+	mkdir -p $(TEMP_INSTALL_ROOT)/bin
+	cp $(REMOTE_CMDS_SOURCE_CODE)/build/Products/telnet $(TEMP_INSTALL_ROOT)/bin/telnet
+
 $(APP)/Contents/%: app/%
 	mkdir -p $(@D) && cp $< $@
 
@@ -204,6 +226,8 @@ $(APP)/Contents/Frameworks/%.framework: $(TEMP_INSTALL_ROOT)/lib/%.framework
 $(APP)/Contents/Frameworks/%.framework: $(TEMP_INSTALL_ROOT)/lib/%.framework
 	./copy_bundle.py $< $@ $(APP)/Contents/Frameworks $(TEMP_INSTALL_ROOT)/Library/Frameworks $(TEMP_INSTALL_ROOT)/lib
 $(APP)/Contents/Frameworks/%.dylib: $(TEMP_INSTALL_ROOT)/lib/%.dylib
+	./copy_bundle.py $< $@ $(APP)/Contents/Frameworks $(TEMP_INSTALL_ROOT)/lib
+$(APP)/Contents/MacOS/%: $(TEMP_INSTALL_ROOT)/bin/%
 	./copy_bundle.py $< $@ $(APP)/Contents/Frameworks $(TEMP_INSTALL_ROOT)/lib
 $(APP)/Contents/MacOS/%.app: $(TEMP_INSTALL_ROOT)/bin/%.app qt.conf
 	./copy_bundle.py $< $@ $(APP)/Contents/Frameworks $(TEMP_INSTALL_ROOT)/Library/Frameworks $(TEMP_INSTALL_ROOT)/lib
@@ -228,7 +252,8 @@ $(APP): $(APP)/Contents/Info.plist $(APP)/Contents/MacOS/Launcheroni $(APP)/Cont
 	$(APP)/Contents/MacOS/IDLE.app $(APP)/Contents/MacOS/Designer.app $(QT_FRAMEWORKS_APP) $(QT_PLUGINS) \
 	$(APP)/Contents/Frameworks/libSDL2-2.0.0.dylib $(APP)/Contents/Frameworks/libSDL2_image-2.0.0.dylib \
 	$(APP)/Contents/Frameworks/libSDL2_mixer-2.0.0.dylib $(APP)/Contents/Frameworks/libSDL2_ttf-2.0.0.dylib \
-	$(PYGAME_MODULE) $(EASYGUI_MODULE) $(APP)/Contents/MacOS/python $(APP)/Contents/MacOS/python3
+	$(PYGAME_MODULE) $(EASYGUI_MODULE) $(APP)/Contents/MacOS/python $(APP)/Contents/MacOS/python3 \
+	$(APP)/Contents/MacOS/telnet
 	# Need to copy Python.framework in this step, not using the rules above, so we
 	# know Tk/Qt/etc have been properly installed into them.
 	./copy_bundle.py $(TEMP_INSTALL_ROOT)/Library/Frameworks/Python.framework $(APP)/Contents/Frameworks/Python.framework $(APP)/Contents/Frameworks $(TEMP_INSTALL_ROOT)/Library/Frameworks $(TEMP_INSTALL_ROOT)/lib
