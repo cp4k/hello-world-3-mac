@@ -112,7 +112,10 @@ $(QMAKE) $(QT_FRAMEWORKS_INSTALLROOT) $(QT_PLUGINS) $(QT_DESIGNER): $(QT_SOURCE_
 		-no-sql-db2 -no-sql-ibase -no-sql-mysql -no-sql-oci \
 		-no-sql-odbc -no-sql-psql -no-sql-sqlite -no-sql-sqlite2 \
 		-no-sql-tds
-	$(MAKE) -C $(QT_SOURCE_CODE)
+	# FIXME: Qt compilation seems to fail... sometimes... for seemingly no reason.
+	# The built files still look okay, so let's just ignore errors. (And run
+	# without parallelism just to be safe.)
+	$(MAKE) -C $(QT_SOURCE_CODE) -j1 || true
 	$(MAKE) -C $(QT_SOURCE_CODE) -j1 install
 
 SIP = $(PYTHON_FRAMEWORK)/Versions/Current/bin/sip
