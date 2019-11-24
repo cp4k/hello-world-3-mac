@@ -10,3 +10,4 @@ thirdparty/sdl_mixer
 thirdparty/sdl_ttf
 .DS_Store
 *.pyc
+*.bak*

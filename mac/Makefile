@@ -27,62 +27,9 @@ EASYGUI_SOURCE_CODE ?= $(REPO)/thirdparty/easygui
 export CFLAGS = -arch x86_64 -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET) -O2
 
 default: build-app
-
-$(REPO)/thirdparty/xz:
-	cd $(REPO)/thirdparty && \
-	curl https://tukaani.org/xz/xz-5.2.4.tar.gz --output xz.tar.gz -L && \
-	echo 'b512f3b726d3b37b6dc4c8570e137b9311e7552e8ccbab4d39d47ce5f4177145  xz.tar.gz' | shasum -a 256 -c && \
-	tar -xvf xz.tar.gz && \
-	mv xz-5.2.4 xz && \
-	rm xz.tar.gz
-
-$(REPO)/thirdparty/sip:
-	cd $(REPO)/thirdparty && \
-	curl https://www.riverbankcomputing.com/static/Downloads/sip/4.19.19/sip-4.19.19.tar.gz --output sip.tar.gz -L && \
-	echo '5436b61a78f48c7e8078e93a6b59453ad33780f80c644e5f3af39f94be1ede44  sip.tar.gz' | shasum -a 256 -c && \
-	tar -xvf sip.tar.gz && \
-	mv sip-4.19.19 sip && \
-	rm sip.tar.gz
 	
-$(REPO)/thirdparty/pyqt:
-	cd $(REPO)/thirdparty && \
-	curl https://www.riverbankcomputing.com/static/Downloads/PyQt5/5.13.1/PyQt5_gpl-5.13.1.tar.gz --output pyqt.tar.gz -L && \
-	echo '54b7f456341b89eeb3930e786837762ea67f235e886512496c4152ebe106d4af  pyqt.tar.gz' | shasum -a 256 -c && \
-	tar -xvf pyqt.tar.gz && \
-	mv PyQt5_gpl-5.13.1 pyqt && \
-	rm pyqt.tar.gz
-
-$(REPO)/thirdparty/sdl:
-	cd $(REPO)/thirdparty && \
-	curl https://www.libsdl.org/release/SDL2-2.0.10.tar.gz --output sdl.tar.gz -L && \
-	echo 'b4656c13a1f0d0023ae2f4a9cf08ec92fffb464e0f24238337784159b8b91d57  sdl.tar.gz' | shasum -a 256 -c && \
-	tar -xvf sdl.tar.gz && \
-	mv SDL2-2.0.10 sdl && \
-	rm sdl.tar.gz
-
-$(REPO)/thirdparty/sdl_image:
-	cd $(REPO)/thirdparty && \
-	curl https://www.libsdl.org/projects/SDL_image/release/SDL2_image-2.0.5.tar.gz --output sdl_image.tar.gz -L && \
-	echo 'bdd5f6e026682f7d7e1be0b6051b209da2f402a2dd8bd1c4bd9c25ad263108d0  sdl_image.tar.gz' | shasum -a 256 -c && \
-	tar -xvf sdl_image.tar.gz && \
-	mv SDL2_image-2.0.5 sdl_image && \
-	rm sdl_image.tar.gz
-
-$(REPO)/thirdparty/sdl_mixer:
-	cd $(REPO)/thirdparty && \
-	curl https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-2.0.4.tar.gz --output sdl_mixer.tar.gz -L && \
-	echo 'b4cf5a382c061cd75081cf246c2aa2f9df8db04bdda8dcdc6b6cca55bede2419  sdl_mixer.tar.gz' | shasum -a 256 -c && \
-	tar -xvf sdl_mixer.tar.gz && \
-	mv SDL2_mixer-2.0.4 sdl_mixer && \
-	rm sdl_mixer.tar.gz
-	
-$(REPO)/thirdparty/sdl_ttf:
-	cd $(REPO)/thirdparty && \
-	curl https://www.libsdl.org/projects/SDL_ttf/release/SDL2_ttf-2.0.15.tar.gz --output sdl_ttf.tar.gz -L && \
-	echo 'a9eceb1ad88c1f1545cd7bd28e7cbc0b2c14191d40238f531a15b01b1b22cd33  sdl_ttf.tar.gz' | shasum -a 256 -c && \
-	tar -xvf sdl_ttf.tar.gz && \
-	mv SDL2_ttf-2.0.15 sdl_ttf && \
-	rm sdl_ttf.tar.gz
+%: %.dl.txt scripts/dl.sh
+	cat $< | xargs scripts/dl.sh $<
 
 TCL_FRAMEWORK = $(TEMP_INSTALL_ROOT)/Library/Frameworks/Tcl.framework
 $(TCL_FRAMEWORK): $(TCL_SOURCE_CODE)
