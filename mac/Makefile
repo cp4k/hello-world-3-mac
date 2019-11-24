@@ -1,8 +1,9 @@
 REPO ?= ..
 WORKDIR ?= build
 DISTDIR ?= dist
+
+# If you change this, make sure to also update app/Info.plist.
 MACOSX_DEPLOYMENT_TARGET ?= 10.12
-TK_VERSION ?= 8.6
 
 TEMP_INSTALL_ROOT ?= $(abspath $(WORKDIR))/temporary_install_root
 APP ?= $(DISTDIR)/HelloWorld3.app
@@ -29,9 +30,13 @@ REMOTE_CMDS_SOURCE_CODE ?= $(REPO)/thirdparty/remote_cmds
 export CFLAGS = -arch x86_64 -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET) -O2
 
 default: $(APP)
-	
+
+# Use dl.txt files to download any needed sources if they don't already exist.
+
 %: %.dl.txt scripts/dl.sh
 	cat $< | xargs scripts/dl.sh $<
+
+# Compile each of the libraries and install them into TEMP_INSTALL_ROOT:
 
 TCL_FRAMEWORK = $(TEMP_INSTALL_ROOT)/Library/Frameworks/Tcl.framework
 $(TCL_FRAMEWORK): $(TCL_SOURCE_CODE)
@@ -117,7 +122,6 @@ $(PYQT_MODULE): $(PYQT_SOURCE_CODE) $(SIP) $(PYTHON_FRAMEWORK) $(QMAKE)
 	$(MAKE) -C $(PYQT_SOURCE_CODE)
 	$(MAKE) -C $(PYQT_SOURCE_CODE) -j1 install
 
-
 SDL_LIBRARY = $(TEMP_INSTALL_ROOT)/lib/libSDL2-2.0.0.dylib
 SDL_CONFIG = $(TEMP_INSTALL_ROOT)/bin/sdl2-config
 $(SDL_LIBRARY) $(SDL_CONFIG): $(SDL_SOURCE_CODE)
@@ -125,7 +129,11 @@ $(SDL_LIBRARY) $(SDL_CONFIG): $(SDL_SOURCE_CODE)
 		./configure --disable-static --enable-shared --enable-rpath --disable-video-x11 --prefix=$(TEMP_INSTALL_ROOT)
 	$(MAKE) -C $(SDL_SOURCE_CODE)
 	$(MAKE) -C $(SDL_SOURCE_CODE) -j1 install
-	
+
+# The source tarballs for sdl_image, sdl_ttf, and sdl_mixer include some
+# vendored dependencies. To keep things simple, we just compile/install those
+# as part of compiling the libraries.
+
 SDL_IMAGE_LIBRARY = $(TEMP_INSTALL_ROOT)/lib/libSDL2_image-2.0.0.dylib
 SDL_IMAGE_SOURCE_ABS = $(abspath $(SDL_IMAGE_SOURCE_CODE))
 $(SDL_IMAGE_LIBRARY): $(SDL_IMAGE_SOURCE_CODE) $(SDL_LIBRARY)
@@ -207,9 +215,11 @@ $(TELNET_BINARY): $(REMOTE_CMDS_SOURCE_CODE) $(LIBTELNET_LIBRARY)
 	mkdir -p $(TEMP_INSTALL_ROOT)/bin
 	cp $(REMOTE_CMDS_SOURCE_CODE)/build/Products/telnet $(TEMP_INSTALL_ROOT)/bin/telnet
 
+# Create the app bundle by copying stuff in from the app/ folder, compiling
+# C, Objective-C, and nib files as needed.
+
 $(APP)/Contents/%: app/%
 	mkdir -p $(@D) && cp $< $@
-
 $(APP)/Contents/%.nib: app/%.xib
 	mkdir -p $(@D) && ibtool --compile $@ $<
 
@@ -218,6 +228,9 @@ $(APP)/Contents/MacOS/%: app/%.m
 $(APP)/Contents/MacOS/%: app/%.c
 	mkdir -p $(@D) && $(CC) $(CFLAGS) $< -o $@
 
+# When we copy the libraries/binaries from TEMP_INSTALL_ROOT, we use
+# copy_bundle.py to edit them so they can still find their dynamic library
+# dependencies.
 
 $(APP)/Contents/Frameworks/%.framework: $(TEMP_INSTALL_ROOT)/Library/Frameworks/%.framework
 	./copy_bundle.py $< $@ $(APP)/Contents/Frameworks $(TEMP_INSTALL_ROOT)/Library/Frameworks $(TEMP_INSTALL_ROOT)/lib
@@ -234,16 +247,7 @@ $(APP)/Contents/MacOS/%.app: $(TEMP_INSTALL_ROOT)/bin/%.app qt.conf
 	mkdir -p $@/Contents/Resources
 	cp qt.conf $@/Contents/Resources/
 
-IDLE_APP=$(APP)/Contents/MacOS/IDLE.app
-$(IDLE_APP)/Contents/%: idle_app/%
-	mkdir -p $(@D) && cp $< $@
-
-$(IDLE_APP)/Contents/MacOS/%: idle_app/%.c
-	mkdir -p $(@D) && $(CC) $(CFLAGS) $< -o $@
-
-$(IDLE_APP): $(IDLE_APP)/Contents/Info.plist $(IDLE_APP)/Contents/Resources/IDLE.icns \
-	$(IDLE_APP)/Contents/Resources/PythonCompiled.icns $(IDLE_APP)/Contents/Resources/PythonSource.icns \
-	$(IDLE_APP)/Contents/MacOS/IDLE
+# Alright, here's the big list of all the stuff the app bundle needs.
 
 APP_IMAGES = $(addsuffix .png,$(addprefix $(APP)/Contents/Resources/,IDLE Designer Terminal IDLE@2x Designer@2x Terminal@2x))
 $(APP): $(APP)/Contents/Info.plist $(APP)/Contents/MacOS/Launcheroni $(APP)/Contents/Resources/AppIcon.icns $(APP_IMAGES) \
@@ -260,10 +264,20 @@ $(APP): $(APP)/Contents/Info.plist $(APP)/Contents/MacOS/Launcheroni $(APP)/Cont
 	./copy_bundle.py $(TEMP_INSTALL_ROOT)/Library/Frameworks/Python.framework $(APP)/Contents/Frameworks/Python.framework $(APP)/Contents/Frameworks $(TEMP_INSTALL_ROOT)/Library/Frameworks $(TEMP_INSTALL_ROOT)/lib
 	./copy_bundle.py $(QT_PLUGINS) $(APP)/Contents/PlugIns $(APP)/Contents/Frameworks $(TEMP_INSTALL_ROOT)/Library/Frameworks
 
+# We need to make our own version of IDLE.app because the one that comes with
+# Python hard-codes the path to Python.
+
+IDLE_APP=$(APP)/Contents/MacOS/IDLE.app
+$(IDLE_APP)/Contents/%: idle_app/%
+	mkdir -p $(@D) && cp $< $@
+$(IDLE_APP)/Contents/MacOS/%: idle_app/%.c
+	mkdir -p $(@D) && $(CC) $(CFLAGS) $< -o $@
+$(IDLE_APP): $(IDLE_APP)/Contents/Info.plist $(IDLE_APP)/Contents/Resources/IDLE.icns \
+	$(IDLE_APP)/Contents/Resources/PythonCompiled.icns $(IDLE_APP)/Contents/Resources/PythonSource.icns \
+	$(IDLE_APP)/Contents/MacOS/IDLE
 
 clean-%: $(REPO)/thirdparty/%/.git
 	cd $(REPO)/thirdparty/$* && git clean -xfd && git submodule foreach --recursive git clean -xfd
-
 clean-%: $(REPO)/thirdparty/%.dl.txt
 	rm -rf $(REPO)/thirdparty/$*/
 

@@ -1,5 +1,20 @@
 #!/usr/bin/python2.7
 
+# Copies a file/directory into an app bundle, rewriting dynamic load commands
+# to use @rpath instead of absolute paths.
+#
+# Invoked by the Makefile as:
+#   ./copy_bundle.py [source path] [destination path] [destination library directory] [source library directory] [source library directory]...
+#
+# The source library directories are changed to @rpath in the copied binaries.
+# If the resulting binary has any @rpath load commands, this invokes
+# install_name_tool to the destination library directory as an rpath to the
+# binary.
+#
+# The goal of this is to copy the given files into the app bundle and make sure
+# they can still find their dynamically-linked dependencies when the app bundle
+# is moved/installed somewhere else.
+
 import os
 import os.path
 import subprocess
