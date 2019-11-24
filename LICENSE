@@ -1,0 +1,7 @@
+This software package includes many open-source sub-components with different
+owners and licenses. Please see the LICENSE files in their respective
+subdirectories for details.
+
+The package-build and launcher code is copyright Warren & Carter Sande, 2019.
+It is released under the MIT license:
+https://opensource.org/licenses/mit-license.php

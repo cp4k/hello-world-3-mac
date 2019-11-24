@@ -248,6 +248,7 @@ $(IDLE_APP): $(IDLE_APP)/Contents/Info.plist $(IDLE_APP)/Contents/Resources/IDLE
 APP_IMAGES = $(addsuffix .png,$(addprefix $(APP)/Contents/Resources/,IDLE Designer Terminal IDLE@2x Designer@2x Terminal@2x))
 $(APP): $(APP)/Contents/Info.plist $(APP)/Contents/MacOS/Launcheroni $(APP)/Contents/Resources/AppIcon.icns $(APP_IMAGES) \
 	$(APP)/Contents/Resources/setup_environment.sh $(APP)/Contents/Resources/Base.lproj/MainMenu.nib \
+	$(APP)/Contents/Resources/Credits.rtf \
 	$(PYQT_MODULE) $(APP)/Contents/Frameworks/Tcl.framework $(APP)/Contents/Frameworks/Tk.framework \
 	$(APP)/Contents/MacOS/IDLE.app $(APP)/Contents/MacOS/Designer.app $(QT_FRAMEWORKS_APP) $(QT_PLUGINS) \
 	$(APP)/Contents/Frameworks/libSDL2-2.0.0.dylib $(APP)/Contents/Frameworks/libSDL2_image-2.0.0.dylib \

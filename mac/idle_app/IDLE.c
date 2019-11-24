@@ -3,7 +3,6 @@
 //  HelloWorld3
 //
 //  Created by Carter Sande on 8/18/19.
-//  Copyright © 2019 Manning Publications Inc. All rights reserved.
 //
 
 #define _GNU_SOURCE
