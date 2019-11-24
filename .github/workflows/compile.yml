@@ -1,0 +1,17 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: macOS-latest
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: true
+    - name: Build the software package
+      run: make -C mac -j2
+    - uses: actions/upload-artifact@v1
+      with:
+        name: HelloWorld3.app
+        path: mac/dist/HelloWorld.app
