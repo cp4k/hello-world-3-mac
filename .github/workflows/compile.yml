@@ -8,7 +8,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
       with:
-        submodules: true
+        submodules: recursive
     - name: Build the software package
       run: |
         sudo mkdir -p /Library/HelloWorld3/TempBuild
