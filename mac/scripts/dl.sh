@@ -27,3 +27,4 @@ echo "$SHA256  $DLFILENAME" | shasum -a 256 -c
 tar -xvf "$DLFILENAME"
 mv "$TARDIR" "$(basename "$OUTDIR")"
 rm $DLFILENAME
+touch "$(basename "$OUTDIR")"
