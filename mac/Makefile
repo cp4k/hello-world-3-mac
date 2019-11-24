@@ -28,7 +28,7 @@ REMOTE_CMDS_SOURCE_CODE ?= $(REPO)/thirdparty/remote_cmds
 
 export CFLAGS = -arch x86_64 -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET) -O2
 
-default: build-app
+default: $(APP)
 	
 %: %.dl.txt scripts/dl.sh
 	cat $< | xargs scripts/dl.sh $<
@@ -259,42 +259,18 @@ $(APP): $(APP)/Contents/Info.plist $(APP)/Contents/MacOS/Launcheroni $(APP)/Cont
 	./copy_bundle.py $(TEMP_INSTALL_ROOT)/Library/Frameworks/Python.framework $(APP)/Contents/Frameworks/Python.framework $(APP)/Contents/Frameworks $(TEMP_INSTALL_ROOT)/Library/Frameworks $(TEMP_INSTALL_ROOT)/lib
 	./copy_bundle.py $(QT_PLUGINS) $(APP)/Contents/PlugIns $(APP)/Contents/Frameworks $(TEMP_INSTALL_ROOT)/Library/Frameworks
 
-build-tk: $(TCL_FRAMEWORK) $(TK_FRAMEWORK)
-build-xz: $(XZ_LIBRARY)
-build-sqlite: $(SQLITE_LIBRARY)
-build-openssl: $(OPENSSL_LIBRARY)
-build-python: $(PYTHON_FRAMEWORK)
-build-qt: $(QMAKE)
-build-sip: $(SIP)
-build-pyqt: $(PYQT_MODULE)
-build-sdl: $(SDL_LIBRARY) $(SDL_IMAGE_LIBRARY) $(SDL_TTF_LIBRARY) $(SDL_MIXER_LIBRARY)
-build-pygame: $(PYGAME_MODULE)
-build-app: $(APP)
-build-idle: $(IDLE_APP)
 
-clean: clean-tk clean-xz clean-sqlite clean-openssl clean-python clean-qt clean-sip clean-pyqt
+clean-%: $(REPO)/thirdparty/%/.git
+	cd $(REPO)/thirdparty/$* && git clean -xfd && git submodule foreach --recursive git clean -xfd
+
+clean-%: $(REPO)/thirdparty/%.dl.txt
+	rm -rf $(REPO)/thirdparty/$*/
+
+clean-python: clean-cpython
+clean-telnet: clean-libtelnet clean-remote_cmds
+
+clean: clean-python clean-easygui clean-telnet clean-openssl clean-pygame clean-pyqt clean-qt5 clean-sdl_image clean-sdl_mixer clean-sdl_ttf clean-setuptools clean-sip clean-sqlite clean-tcl clean-tk clean-xz
 	rm -rf $(TEMP_INSTALL_ROOT)
 	rm -rf $(APP)
-clean-tk:
-	$(MAKE) -C $(TCL_SOURCE_CODE)/unix clean || true
-	$(MAKE) -C $(TK_SOURCE_CODE)/unix clean || true
-clean-xz:
-	$(MAKE) -C $(TK_SOURCE_CODE)/xz clean || true
-clean-sqlite:
-	$(MAKE) -C $(SQLITE_SOURCE_CODE) clean || true
-clean-openssl:
-	$(MAKE) -C $(OPENSSL_SOURCE_CODE) clean || true
-clean-python:
-	$(MAKE) -C $(PYTHON_SOURCE_CODE) clean || true
-	$(MAKE) -C $(PYTHON_SOURCE_CODE) distclean || true
-clean-qt:
-	# Qt's `make clean` takes FOREVER!
-	cd $(QT_SOURCE_CODE) && git clean -xfd && git submodule foreach --recursive git clean -xfd
-clean-sip:
-	$(MAKE) -C $(SIP_SOURCE_CODE) clean || true
-clean-pyqt:
-	$(MAKE) -C $(PYQT_SOURCE_CODE) clean || true
-	
-.PHONY: build-tk build-xz build-sqlite build-openssl build-python build-qt build-sip build-pyqt build-idle build-app
-.PHONY: clean clean-tk clean-xz clean-sqlite clean-openssl clean-python clean-qt clean-sip clean-pyqt
-.PHONY: default
+
+.PHONY: clean default
