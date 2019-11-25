@@ -20,7 +20,7 @@ do
 done
 
 # Codesign the app
-codesign --options=runtime -s "$SIGNING_IDENTITY" -v --timestamp --deep --force HelloWorld3.app
+codesign --entitlements=app.entitlements --options=runtime -s "$SIGNING_IDENTITY" -v --timestamp --deep --force HelloWorld3.app
 
 # Submit app for notarization
 ditto -c -k --keepParent HelloWorld3.app HelloWorld3_fornotarization.zip
