@@ -13,8 +13,8 @@ jobs:
       run: |
         sudo mkdir -p /Library/HelloWorld3/TempBuild
         sudo chown $(whoami) /Library/HelloWorld3/TempBuild
-        make -C mac TEMP_INSTALL_ROOT=/Library/HelloWorld3/TempBuild -j2
+        make -C mac TEMP_INSTALL_ROOT=/Library/HelloWorld3/TempBuild -j2 dist/HelloWorld3.app.zip
     - uses: actions/upload-artifact@v1
       with:
-        name: HelloWorld3.app
-        path: mac/dist/HelloWorld3.app
+        name: HelloWorld3.app.zip
+        path: mac/dist/HelloWorld3.app.zip

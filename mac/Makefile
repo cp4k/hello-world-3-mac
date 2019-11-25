@@ -285,6 +285,9 @@ $(IDLE_APP): $(IDLE_APP)/Contents/Info.plist $(IDLE_APP)/Contents/Resources/IDLE
 	$(IDLE_APP)/Contents/Resources/PythonCompiled.icns $(IDLE_APP)/Contents/Resources/PythonSource.icns \
 	$(IDLE_APP)/Contents/MacOS/IDLE
 
+dist/%.app.zip: dist/%.app
+	cd $(dir $<) && ditto --keepParent -c -k $*.app $*.app.zip
+
 clean-%: $(REPO)/thirdparty/%/.git
 	cd $(REPO)/thirdparty/$* && git clean -xfd && git submodule foreach --recursive git clean -xfd
 clean-%: $(REPO)/thirdparty/%.dl.txt
