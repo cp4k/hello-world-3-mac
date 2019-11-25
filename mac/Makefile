@@ -29,7 +29,7 @@ REMOTE_CMDS_SOURCE_CODE ?= $(REPO)/thirdparty/remote_cmds
 
 export CFLAGS = -arch x86_64 -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET) -O2
 
-default: $(APP)
+default: $(TEMP_INSTALL_ROOT) $(APP)
 
 # Use dl.txt files to download any needed sources if they don't already exist.
 
@@ -49,7 +49,7 @@ $(TEMP_INSTALL_ROOT):
 	mkdir -p $(TEMP_INSTALL_ROOT)/Applications
 
 TCL_FRAMEWORK = $(TEMP_INSTALL_ROOT)/Library/Frameworks/Tcl.framework
-$(TCL_FRAMEWORK): $(TCL_SOURCE_CODE) $(TEMP_INSTALL_ROOT)
+$(TCL_FRAMEWORK): $(TCL_SOURCE_CODE)
 	mkdir -p $(TEMP_INSTALL_ROOT)
 	cd $(TCL_SOURCE_CODE)/unix && ./configure --enable-framework --enable-threads --prefix=$(TEMP_INSTALL_ROOT) --libdir=$(TEMP_INSTALL_ROOT)/Library/Frameworks
 	$(MAKE) -C $(TCL_SOURCE_CODE)/unix
@@ -62,19 +62,19 @@ $(TK_FRAMEWORK): $(TK_SOURCE_CODE) $(TCL_FRAMEWORK)
 	$(MAKE) -C $(TK_SOURCE_CODE)/unix install -j1 -W html -W html-tcl -W html-tk -W install-doc
 
 XZ_LIBRARY = $(TEMP_INSTALL_ROOT)/usr/local/lib/liblzma.la
-$(XZ_LIBRARY): $(XZ_SOURCE_CODE) $(TEMP_INSTALL_ROOT)
+$(XZ_LIBRARY): $(XZ_SOURCE_CODE)
 	cd $(XZ_SOURCE_CODE) && ./configure --disable-shared --enable-static --disable-dependency-tracking
 	$(MAKE) -C $(XZ_SOURCE_CODE) install DESTDIR="$(TEMP_INSTALL_ROOT)"
 	
 SQLITE_LIBRARY = $(TEMP_INSTALL_ROOT)/usr/local/lib/libsqlite3.a
-$(SQLITE_LIBRARY): $(SQLITE_SOURCE_CODE) $(TEMP_INSTALL_ROOT)
+$(SQLITE_LIBRARY): $(SQLITE_SOURCE_CODE)
 	cd $(SQLITE_SOURCE_CODE) && \
 	  export CFLAGS="$(CFLAGS) -Os -DSQLITE_ENABLE_FTS5 -DSQLITE_ENABLE_FTS4 -DSQLITE_ENABLE_FTS3_PARENTHESIS -DSQLITE_ENABLE_JSON1 -DSQLITE_ENABLE_RTREE -DSQLITE_TCL=0" && \
 	  ./configure --enable-threadsafe --enable-shared=no --enable-static=yes --disable-readline --disable-dependency-tracking
 	$(MAKE) -C $(SQLITE_SOURCE_CODE) install DESTDIR="$(TEMP_INSTALL_ROOT)"
 
 OPENSSL_LIBRARY = $(TEMP_INSTALL_ROOT)/usr/local/lib/pkgconfig/openssl.pc
-$(OPENSSL_LIBRARY): $(OPENSSL_SOURCE_CODE) $(TEMP_INSTALL_ROOT)
+$(OPENSSL_LIBRARY): $(OPENSSL_SOURCE_CODE)
 	cd $(OPENSSL_SOURCE_CODE) && perl Configure darwin64-x86_64-cc enable-ec_nistp_64_gcc_128 no-shared
 	$(MAKE) -C $(OPENSSL_SOURCE_CODE) install_sw DESTDIR="$(TEMP_INSTALL_ROOT)" -j1
 
@@ -98,7 +98,7 @@ QT_FRAMEWORKS_INSTALLROOT = $(addprefix $(TEMP_INSTALL_ROOT)/lib/,$(QT_FRAMEWORK
 QT_FRAMEWORKS_APP = $(addprefix $(APP)/Contents/Frameworks/,$(QT_FRAMEWORK_NAMES))
 QT_PLUGINS = $(TEMP_INSTALL_ROOT)/plugins
 QT_DESIGNER = $(TEMP_INSTALL_ROOT)/bin/Designer.app
-$(QMAKE) $(QT_FRAMEWORKS_INSTALLROOT) $(QT_PLUGINS) $(QT_DESIGNER): $(QT_SOURCE_CODE) $(TEMP_INSTALL_ROOT)
+$(QMAKE) $(QT_FRAMEWORKS_INSTALLROOT) $(QT_PLUGINS) $(QT_DESIGNER): $(QT_SOURCE_CODE)
 	cd $(QT_SOURCE_CODE) && \
 		./configure -prefix $(TEMP_INSTALL_ROOT) -release -opensource -confirm-license \
 		-system-zlib -qt-libjpeg -qt-libpng -qt-freetype -qt-pcre -qt-harfbuzz \
@@ -116,7 +116,7 @@ $(QMAKE) $(QT_FRAMEWORKS_INSTALLROOT) $(QT_PLUGINS) $(QT_DESIGNER): $(QT_SOURCE_
 	# The built files still look okay, so let's just ignore errors. (And run
 	# without parallelism just to be safe.)
 	$(MAKE) -C $(QT_SOURCE_CODE) -j1 || true
-	$(MAKE) -C $(QT_SOURCE_CODE) -j1 install
+	$(MAKE) -C $(QT_SOURCE_CODE) -j1 install || true
 
 SIP = $(PYTHON_FRAMEWORK)/Versions/Current/bin/sip
 $(SIP): $(SIP_SOURCE_CODE) $(PYTHON_FRAMEWORK)
@@ -136,7 +136,7 @@ $(PYQT_MODULE): $(PYQT_SOURCE_CODE) $(SIP) $(PYTHON_FRAMEWORK) $(QMAKE)
 
 SDL_LIBRARY = $(TEMP_INSTALL_ROOT)/lib/libSDL2-2.0.0.dylib
 SDL_CONFIG = $(TEMP_INSTALL_ROOT)/bin/sdl2-config
-$(SDL_LIBRARY) $(SDL_CONFIG): $(SDL_SOURCE_CODE) $(TEMP_INSTALL_ROOT)
+$(SDL_LIBRARY) $(SDL_CONFIG): $(SDL_SOURCE_CODE)
 	cd $(SDL_SOURCE_CODE) && \
 		./configure --disable-static --enable-shared --enable-rpath --disable-video-x11 --prefix=$(TEMP_INSTALL_ROOT)
 	$(MAKE) -C $(SDL_SOURCE_CODE)
@@ -196,19 +196,19 @@ $(SETUPTOOLS_MODULE): $(SETUPTOOLS_SOURCE_CODE) $(PYTHON_FRAMEWORK)
 	cd $(SETUPTOOLS_SOURCE_CODE) && $(PYTHON_FRAMEWORK)/Versions/Current/bin/python3 bootstrap.py
 	cd $(SETUPTOOLS_SOURCE_CODE) && $(PYTHON_FRAMEWORK)/Versions/Current/bin/python3 setup.py install
 
-PYGAME_MODULE = $(TEMP_INSTALL_ROOT)/pygame-built
+PYGAME_MODULE = $(PYTHON_FRAMEWORK)/Versions/3.7/share/pygame-built
 $(PYGAME_MODULE): $(PYGAME_SOURCE_CODE) Pygame-Setup $(SDL_LIBRARY) $(SDL_IMAGE_LIBRARY) $(SDL_MIXER_LIBRARY) $(SDL_TTF_LIBRARY) $(SETUPTOOLS_MODULE)
 	sed s~TEMP_INSTALL_ROOT~$(TEMP_INSTALL_ROOT)~g Pygame-Setup > $(PYGAME_SOURCE_CODE)/Setup
 	cd $(PYGAME_SOURCE_CODE) && $(PYTHON_FRAMEWORK)/Versions/Current/bin/python3 setup.py install
 	touch $(PYGAME_MODULE)
 
-EASYGUI_MODULE = $(TEMP_INSTALL_ROOT)/easygui-built
+EASYGUI_MODULE = $(PYTHON_FRAMEWORK)/Versions/3.7/share/easygui-built
 $(EASYGUI_MODULE): $(EASYGUI_SOURCE_CODE) $(SETUPTOOLS_MODULE)
 	cd $(EASYGUI_SOURCE_CODE) && $(PYTHON_FRAMEWORK)/Versions/Current/bin/python3 setup.py install
 	touch $(EASYGUI_MODULE)
 
 LIBTELNET_LIBRARY = $(TEMP_INSTALL_ROOT)/lib/libtelnet.a
-$(LIBTELNET_LIBRARY): $(LIBTELNET_SOURCE_CODE) $(TEMP_INSTALL_ROOT)
+$(LIBTELNET_LIBRARY): $(LIBTELNET_SOURCE_CODE)
 	cd $(LIBTELNET_SOURCE_CODE) && xcodebuild SYMROOT=build -arch x86_64
 	cp $(LIBTELNET_SOURCE_CODE)/build/Release/libtelnet.a $(TEMP_INSTALL_ROOT)/lib/libtelnet.a
 	cp -r $(LIBTELNET_SOURCE_CODE)/build/Release/usr/local/include/libtelnet $(TEMP_INSTALL_ROOT)/include/libtelnet
