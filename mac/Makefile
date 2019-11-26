@@ -249,7 +249,7 @@ $(APP)/Contents/Frameworks/%.framework: $(TEMP_INSTALL_ROOT)/lib/%.framework
 	./copy_bundle.py $< $@ $(APP)/Contents/Frameworks $(TEMP_INSTALL_ROOT)/Library/Frameworks $(TEMP_INSTALL_ROOT)/lib
 $(APP)/Contents/Frameworks/%.dylib: $(TEMP_INSTALL_ROOT)/lib/%.dylib
 	./copy_bundle.py $< $@ $(APP)/Contents/Frameworks $(TEMP_INSTALL_ROOT)/lib
-$(APP)/Contents/MacOS/%: $(TEMP_INSTALL_ROOT)/bin/%
+$(APP)/Contents/MacOS/telnet: $(TEMP_INSTALL_ROOT)/bin/telnet
 	./copy_bundle.py $< $@ $(APP)/Contents/Frameworks $(TEMP_INSTALL_ROOT)/lib
 $(APP)/Contents/MacOS/%.app: $(TEMP_INSTALL_ROOT)/bin/%.app qt.conf
 	./copy_bundle.py $< $@ $(APP)/Contents/Frameworks $(TEMP_INSTALL_ROOT)/Library/Frameworks $(TEMP_INSTALL_ROOT)/lib
