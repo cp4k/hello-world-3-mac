@@ -7,7 +7,7 @@
 
 clear
 
-contents=$(cd "$(dirname $0)/.."; pwd)
+contents=$(cd "$(dirname "$0")/.."; pwd)
 export TCL_LIBRARY="$contents/Frameworks/Tcl.framework/Versions/8.6/Resources/Scripts"
 export TK_LIBRARY="$contents/Frameworks/Tk.framework/Versions/8.6/Resources/Scripts"
 export QT_PLUGIN_PATH="$contents/PlugIns"
