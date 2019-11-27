@@ -20,8 +20,8 @@ echo '               Hello World! Third Edition software package. Enjoy!'
 echo '================================================================================'
 echo
 
-if type "zsh" > /dev/null; then
+if [[ ${OSTYPE:6} -ge 19 ]]; then
   exec /usr/bin/env zsh
 fi
-export PS1=\w\$
+export PS1='\w $ '
 exec /usr/bin/env bash
